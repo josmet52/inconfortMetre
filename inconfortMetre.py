@@ -34,6 +34,7 @@ dispaly=pygame.display.set_mode((320, 240))
 # constantes pour les couleurs
 c_color_val = 255
 dim_factor = 3
+c_color_val = int(c_color_val/dim_factor)
 c_black = [0, 0, 0]
 c_green = [0, c_color_val, 0]
 c_red = [c_color_val, 0, 0]
@@ -114,7 +115,7 @@ vTime = newTime - oldTime # delta t en ms
 
 running = True
 sense.set_rotation(90)
-sense.show_message("go")
+sense.show_message("go", text_colour = c_white)
 sense.set_rotation(0)
 
 #try:
@@ -207,21 +208,21 @@ while running:
             sense.set_rotation(90)
             if event.key == pygame.K_UP:
                 csteFiltrage -= 0.5
-                sense.show_message("f" +str(csteFiltrage))
+                sense.show_message("f" +str(csteFiltrage), text_colour = c_white)
                 nMilliSec = int(csteFiltrage/nbrePasses*1000)
                 if debug : print ("csteFiltrage = " + str(csteFiltrage) + " - nMilliSec = " + str(nMilliSec) + " - nbrePasses = " + str(nbrePasses))
             elif event.key == pygame.K_DOWN:
                 csteFiltrage += 0.5
-                sense.show_message("f" +str(csteFiltrage))
+                sense.show_message("f" +str(csteFiltrage), text_colour = c_white)
                 nMilliSec = int(csteFiltrage/nbrePasses*1000)
                 if debug : print ("csteFiltrage = " + str(csteFiltrage) + " - nMilliSec = " + str(nMilliSec) + " - nbrePasses = " + str(nbrePasses))
             elif event.key == pygame.K_LEFT:
                 gainFactor-= 1
-                sense.show_message("g" +str(gainFactor))
+                sense.show_message("g" +str(gainFactor), text_colour = c_white)
                 if debug : print ("gainFactor = " + str(gainFactor))
             elif event.key == pygame.K_RIGHT:
                 gainFactor += 1
-                sense.show_message("g" +str(gainFactor))
+                sense.show_message("g" +str(gainFactor), text_colour = c_white)
                 if debug : print ("gainFactor = " + str(gainFactor))
             elif event.key == pygame.K_RETURN:
                 if debug : print ("k_enter")
@@ -230,6 +231,7 @@ while running:
                     c_color_val = int(c_color_val / dim_factor)
                 else:
                     c_color_val = 255
+                    
                 c_black = [0, 0, 0]
                 c_green = [0, c_color_val, 0]
                 c_red = [c_color_val, 0, 0]
