@@ -28,11 +28,12 @@ sense.clear()
 
 #initialisation pygame
 pygame.init()
-pygame.display.set_mode((320, 240))
+pygame.display.init()
+dispaly=pygame.display.set_mode((320, 240))
 
 # constantes pour les couleurs
 c_color_val = 255
-dim_factor = 4
+dim_factor = 3
 c_black = [0, 0, 0]
 c_green = [0, c_color_val, 0]
 c_red = [c_color_val, 0, 0]
@@ -45,7 +46,7 @@ x_pix = 8
 y_pix = 8
 
 # User Settings
-debug = True
+debug = False
 deepDebug = False
 lightDim = True
 
@@ -55,10 +56,6 @@ for x in sys.argv:
         debug = True
     elif x == "deepDebug":
         deepDebug = True
-    
-    
-    
-    
     
 if debug :
     print("confortmetre version 0.1")
@@ -70,7 +67,7 @@ if debug :
     print("Runing")
 
 # paramètre de l'application
-nbrePasses = 200
+nbrePasses = 100
 csteFiltrage = 10. # filtrage sur 10 secondes
 gainFactor = 10
 passes_thresh = 1
@@ -116,6 +113,10 @@ newTime = int(round(time.time()*1000)) # new time en ms
 vTime = newTime - oldTime # delta t en ms
 
 running = True
+sense.set_rotation(90)
+sense.show_message("go")
+sense.set_rotation(0)
+
 #try:
     
 while running:
@@ -203,23 +204,24 @@ while running:
     for event in pygame.event.get():
         if event.type == KEYDOWN:
             sense.clear()
+            sense.set_rotation(90)
             if event.key == pygame.K_UP:
-                csteFiltrage -= 1
-                sense.show_message(str(csteFiltrage))
+                csteFiltrage -= 0.5
+                sense.show_message("f" +str(csteFiltrage))
                 nMilliSec = int(csteFiltrage/nbrePasses*1000)
-                if debug : print ("csteFiltrage = " + str(csteFiltrage) + " - nMilliSec = " + str(nMilliSec))
+                if debug : print ("csteFiltrage = " + str(csteFiltrage) + " - nMilliSec = " + str(nMilliSec) + " - nbrePasses = " + str(nbrePasses))
             elif event.key == pygame.K_DOWN:
-                csteFiltrage += 1
-                sense.show_message(str(csteFiltrage))
+                csteFiltrage += 0.5
+                sense.show_message("f" +str(csteFiltrage))
                 nMilliSec = int(csteFiltrage/nbrePasses*1000)
-                if debug : print ("csteFiltrage = " + str(csteFiltrage) + " - nMilliSec = " + str(nMilliSec))
+                if debug : print ("csteFiltrage = " + str(csteFiltrage) + " - nMilliSec = " + str(nMilliSec) + " - nbrePasses = " + str(nbrePasses))
             elif event.key == pygame.K_LEFT:
                 gainFactor-= 1
-                sense.show_message(str(gainFactor))
+                sense.show_message("g" +str(gainFactor))
                 if debug : print ("gainFactor = " + str(gainFactor))
             elif event.key == pygame.K_RIGHT:
                 gainFactor += 1
-                sense.show_message(str(gainFactor))
+                sense.show_message("g" +str(gainFactor))
                 if debug : print ("gainFactor = " + str(gainFactor))
             elif event.key == pygame.K_RETURN:
                 if debug : print ("k_enter")
@@ -237,6 +239,7 @@ while running:
             elif event.key == pygame.K_ESCAPE:
                 running = False
                 if debug : print ("k_escape")
+            sense.set_rotation(0)
             
             
 ##        if event.type == KEYUP:
@@ -259,7 +262,7 @@ while running:
     if vTime > nMilliSec :
         
         overTimeCount += 1
-        if debug : print ("." ,overTimeCount)
+        if deepDebug : print ("." + str(overTimeCount) + " " + str(nbrePasses))
         newTime = min(int(round(time.time()*1000)),1)
         vTime = newTime - oldTime
 
@@ -276,7 +279,9 @@ while running:
             print (nbrePasses, cptPasses, nMilliSec, vTime , " - ",)
         cptPasses = 1
         
+sense.set_rotation(90)
 sense.show_message("... bye")
+sense.set_rotation(0)
         
 ##except:
 ##    print
