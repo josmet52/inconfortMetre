@@ -45,9 +45,9 @@ x_pix = 8
 y_pix = 8
 
 # User Settings
-debug = False
+debug = True
 deepDebug = False
-lightDim = False
+lightDim = True
 
 # pour changer un status, passer le mot "debug" ou  "deepDebug" ou "lightDim" en paramètre
 for x in sys.argv: 
@@ -55,15 +55,10 @@ for x in sys.argv:
         debug = True
     elif x == "deepDebug":
         deepDebug = True
-    elif x == "lightDim":
-        lightDim = True
-        c_color_val = c_color_val / dim_factor
-        c_black = [0, 0, 0]
-        c_green = [0, c_color_val, 0]
-        c_red = [c_color_val, 0, 0]
-        c_blue = [0, 0, c_color_val]
-        c_white = [c_color_val, c_color_val, c_color_val]
-        c_yellow = [c_color_val, c_color_val, 0]
+    
+    
+    
+    
     
 if debug :
     print("confortmetre version 0.1")
@@ -145,10 +140,10 @@ while running:
 
     if deepDebug :
         print
-        print x2, x1, vTime, dx
-        print y2, y1, vTime, dy
-        print z2, z1, vTime, dz
-        print dt
+        print (x2, x1, vTime, dx)
+        print (y2, y1, vTime, dy)
+        print (z2, z1, vTime, dz)
+        print (dt)
         print
 
     # totaux pour les moyennes, seule la dernière valeur lue est actualisée
@@ -212,25 +207,25 @@ while running:
                 csteFiltrage -= 1
                 sense.show_message(str(csteFiltrage))
                 nMilliSec = int(csteFiltrage/nbrePasses*1000)
-                if debug : print "csteFiltrage = " + str(csteFiltrage) + " - nMilliSec = " + str(nMilliSec)
+                if debug : print ("csteFiltrage = " + str(csteFiltrage) + " - nMilliSec = " + str(nMilliSec))
             elif event.key == pygame.K_DOWN:
                 csteFiltrage += 1
                 sense.show_message(str(csteFiltrage))
                 nMilliSec = int(csteFiltrage/nbrePasses*1000)
-                if debug : print "csteFiltrage = " + str(csteFiltrage) + " - nMilliSec = " + str(nMilliSec)
+                if debug : print ("csteFiltrage = " + str(csteFiltrage) + " - nMilliSec = " + str(nMilliSec))
             elif event.key == pygame.K_LEFT:
                 gainFactor-= 1
                 sense.show_message(str(gainFactor))
-                if debug : print "gainFactor = " + str(gainFactor)
+                if debug : print ("gainFactor = " + str(gainFactor))
             elif event.key == pygame.K_RIGHT:
                 gainFactor += 1
                 sense.show_message(str(gainFactor))
-                if debug : print "gainFactor = " + str(gainFactor)
+                if debug : print ("gainFactor = " + str(gainFactor))
             elif event.key == pygame.K_RETURN:
-                if debug : print "k_enter"
+                if debug : print ("k_enter")
                 lightDim = not(lightDim)
                 if lightDim:
-                    c_color_val = c_color_val / dim_factor
+                    c_color_val = int(c_color_val / dim_factor)
                 else:
                     c_color_val = 255
                 c_black = [0, 0, 0]
@@ -240,7 +235,9 @@ while running:
                 c_white = [c_color_val, c_color_val, c_color_val]
                 c_yellow = [c_color_val, c_color_val, 0]
             elif event.key == pygame.K_ESCAPE:
-                if debug : print "k_escape"
+                running = False
+                if debug : print ("k_escape")
+            
             
 ##        if event.type == KEYUP:
 ##            #handle_event(event)
@@ -262,7 +259,7 @@ while running:
     if vTime > nMilliSec :
         
         overTimeCount += 1
-        if debug : print "." ,overTimeCount
+        if debug : print ("." ,overTimeCount)
         newTime = min(int(round(time.time()*1000)),1)
         vTime = newTime - oldTime
 
@@ -272,12 +269,14 @@ while running:
         overTimeCount = 0
         if deepDebug :
             print
-            print "+", nbrePasses, cptPasses, " / " , nMilliSec, vTime, " / " , datetime.now()
+            print ("+", nbrePasses, cptPasses, " / " , nMilliSec, vTime, " / " , datetime.now())
 
     if listIndex == 0 :
         if deepDebug :
-            print nbrePasses, cptPasses, nMilliSec, vTime , " - ",
+            print (nbrePasses, cptPasses, nMilliSec, vTime , " - ",)
         cptPasses = 1
+        
+sense.show_message("... bye")
         
 ##except:
 ##    print
