@@ -2,12 +2,25 @@
 # -*- coding: utf-8 -*-
 
 """
+inconfortMetre.py 
+Version 1.0
+19.9.2017
 
-Essai de mesure de l'inconfort de conduite d'une voiture en
+Mesure de l'inconfort de conduite d'une voiture en
 affichant les variations d'accélérations par unité de temps
 inconfort = dacc/dt
 
-(c) metra 2017
+en vert = inconfort longitudinal
+en rouge inconfort transversal
+en bleu inconfort vertical
+en moyenne quadratique des trois mesures
+
+Le joystick permet :
+ haut-bas de changer la sensibilité de l'affichage de l'inconfort
+ gauche-droite de changer la durée du filtrage mobile en secondes
+ centre de changer l'intensité des leds et si 5 pressions successives de quitter le programme
+
+(c) josmet 2017
 joseph.metrailler@bluewin.ch
 
 """
@@ -18,8 +31,8 @@ import os
 import time
 from datetime import datetime
 from math import *
-import pygame
-from pygame.locals import *
+##import pygame
+##from pygame.locals import *
 import sys
 
 #initialisation du Sensehat
@@ -27,14 +40,13 @@ sense = SenseHat()
 sense.clear()
 
 #initialisation pygame
-pygame.init()
-pygame.display.init()
-dispaly=pygame.display.set_mode((320, 240))
+##pygame.init()
+##pygame.display.init()
+##dispaly=pygame.display.set_mode((80, 60))
 
 # constantes pour les couleurs
-c_color_val = 255
 dim_factor = 3
-c_color_val = int(c_color_val/dim_factor)
+c_color_val = int(255 / dim_factor)
 c_black = [0, 0, 0]
 c_green = [0, c_color_val, 0]
 c_red = [c_color_val, 0, 0]
@@ -42,7 +54,7 @@ c_blue = [0, 0, c_color_val]
 c_white = [c_color_val, c_color_val, c_color_val]
 c_yellow = [c_color_val, c_color_val, 0]
 
-# dimensions de l'écran
+# dimensions de la amtrice sensehat
 x_pix = 8
 y_pix = 8
 
@@ -51,7 +63,7 @@ debug = False
 deepDebug = False
 lightDim = True
 
-# pour changer un status, passer le mot "debug" ou  "deepDebug" ou "lightDim" en paramètre
+# pour changer un status, passer le mot "debug" ou  "deepDebug" en paramètre
 for x in sys.argv: 
     if x == "debug":
         debug = True
@@ -69,8 +81,8 @@ if debug :
 
 # paramètre de l'application
 nbrePasses = 100
-csteFiltrage = 10. # filtrage sur 10 secondes
-gainFactor = 10
+csteFiltrage = 5. # filtrage sur 10 secondes
+gainFactor = 5
 passes_thresh = 1
 over_time_limit = 5
 nMilliSec = int(csteFiltrage/nbrePasses*1000)
@@ -90,7 +102,7 @@ while i < nbrePasses:
     mt.append(0)
     i += 1
 
-# setting des valeurs initiales des variables de mesure de l'accélération
+# initialisation des variables de mesure de l'accélération
 x1 = 0
 y1 = 0
 z1 = 0
@@ -104,16 +116,19 @@ totmy = 0
 totmz = 0
 totmt = 0
 
+# initialisation des variables compterus
 cptPasses = 0
 listIndex = 0
 oldTime = 0 
 overTimeCount = 0
 
-# initialisation des variables 
+# initialisation des variables de duree
 newTime = int(round(time.time()*1000)) # new time en ms
 vTime = newTime - oldTime # delta t en ms
 
+# et c'est parti
 running = True
+stopCount = 0
 sense.set_rotation(90)
 sense.show_message("go", text_colour = c_white)
 sense.set_rotation(0)
@@ -201,31 +216,36 @@ while running:
     listIndex = cptPasses % (nbrePasses )
 
     # on attend le nbre de ms prévu
-    
-    for event in pygame.event.get():
-        if event.type == KEYDOWN:
-            sense.clear()
-            sense.set_rotation(90)
-            if event.key == pygame.K_UP:
+
+    for event in sense.stick.get_events():
+#        print("The joystick was {} {}".format(event.action, event.direction))
+        if event.action == "pressed":
+            if deepDebug : print("The joystick was {} {} {}".format(event.action, event.direction, str(stopCount)))
+            if event.direction == "up" :
+                stopCount = 0
                 csteFiltrage -= 0.5
                 sense.show_message("f" +str(csteFiltrage), text_colour = c_white)
                 nMilliSec = int(csteFiltrage/nbrePasses*1000)
-                if debug : print ("csteFiltrage = " + str(csteFiltrage) + " - nMilliSec = " + str(nMilliSec) + " - nbrePasses = " + str(nbrePasses))
-            elif event.key == pygame.K_DOWN:
+                if debug : print ("csteFiltrage = " + str(csteFiltrage) + " - nMilliSec = " + str(nMilliSec) + " - vTime = " + str(vTime) + " - nbrePasses = " + str(nbrePasses))
+            elif event.direction == "down" :
+                stopCount = 0
                 csteFiltrage += 0.5
                 sense.show_message("f" +str(csteFiltrage), text_colour = c_white)
                 nMilliSec = int(csteFiltrage/nbrePasses*1000)
-                if debug : print ("csteFiltrage = " + str(csteFiltrage) + " - nMilliSec = " + str(nMilliSec) + " - nbrePasses = " + str(nbrePasses))
-            elif event.key == pygame.K_LEFT:
+                if debug : print ("csteFiltrage = " + str(csteFiltrage) + " - nMilliSec = " + str(nMilliSec) + " - vTime = " + str(vTime) + " - nbrePasses = " + str(nbrePasses))
+            elif event.direction == "left" :
+                stopCount = 0
                 gainFactor-= 1
                 sense.show_message("g" +str(gainFactor), text_colour = c_white)
                 if debug : print ("gainFactor = " + str(gainFactor))
-            elif event.key == pygame.K_RIGHT:
+            elif event.direction == "right" :
+                stopCount = 0
                 gainFactor += 1
                 sense.show_message("g" +str(gainFactor), text_colour = c_white)
                 if debug : print ("gainFactor = " + str(gainFactor))
-            elif event.key == pygame.K_RETURN:
-                if debug : print ("k_enter")
+            elif event.direction == "middle" :
+                stopCount += 1
+                #if debug : print ("k_enter " + str(stopCount))
                 lightDim = not(lightDim)
                 if lightDim:
                     c_color_val = int(c_color_val / dim_factor)
@@ -238,15 +258,8 @@ while running:
                 c_blue = [0, 0, c_color_val]
                 c_white = [c_color_val, c_color_val, c_color_val]
                 c_yellow = [c_color_val, c_color_val, 0]
-            elif event.key == pygame.K_ESCAPE:
-                running = False
-                if debug : print ("k_escape")
+                
             sense.set_rotation(0)
-            
-            
-##        if event.type == KEYUP:
-##            #handle_event(event)
-##            print "key relaxed", event.type, event.key
             
     while vTime < nMilliSec:
         newTime = int(round(time.time()*1000))
@@ -277,10 +290,13 @@ while running:
             print ("+", nbrePasses, cptPasses, " / " , nMilliSec, vTime, " / " , datetime.now())
 
     if listIndex == 0 :
+        cptPasses = 1
         if deepDebug :
             print (nbrePasses, cptPasses, nMilliSec, vTime , " - ",)
-        cptPasses = 1
-        
+
+    if stopCount > 4 : running = False
+
+# et oui bye bye
 sense.set_rotation(90)
 sense.show_message("... bye")
 sense.set_rotation(0)
