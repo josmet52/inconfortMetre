@@ -102,7 +102,7 @@ while i < nbrePasses:
     mt.append(0)
     i += 1
 
-# initialisation des variables de mesure de l'accélération
+# initialisation des variables de mesure de l'accélération x, y et z
 x1 = 0
 y1 = 0
 z1 = 0
@@ -116,7 +116,7 @@ totmy = 0
 totmz = 0
 totmt = 0
 
-# initialisation des variables compterus
+# initialisation des variables compteurs
 cptPasses = 0
 listIndex = 0
 oldTime = 0 
@@ -214,6 +214,7 @@ while running:
     # mise à jour du compteur de passes et de l'index des listes
     cptPasses += 1
     listIndex = cptPasses % (nbrePasses )
+    
 
     # on attend le nbre de ms prévu
 
