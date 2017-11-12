@@ -15,6 +15,11 @@ en rouge inconfort transversal
 en bleu inconfort vertical
 en moyenne quadratique des trois mesures
 
+nMilliSec = (csteFiltrage / nbrePasses) * 1000
+nMilliSec = temps entre deux mesures en fonction
+            de la constante de temps de filtrage 
+            et du nombre de mesures utilisées pour la moyenne
+
 Le joystick permet :
  haut-bas de changer la sensibilité de l'affichage de l'inconfort
  gauche-droite de changer la durée du filtrage mobile en secondes
@@ -81,7 +86,7 @@ if debug :
 
 # paramètre de l'application
 nbrePasses = 100
-csteFiltrage = 5. # filtrage sur 10 secondes
+csteFiltrage = 5. # filtrage sur 5 secondes
 gainFactor = 5
 passes_thresh = 1
 over_time_limit = 5
